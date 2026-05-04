@@ -15,6 +15,11 @@ MANDATORY_CHANNELS = [
          "url": "https://t.me/a21dev", 
          "name": "Kanal 1"
      },
+        {
+         "id": "@kinoplay_4k", 
+         "url": "https://t.me/kinoplay_4k", 
+         "name": "Kanal 2"
+     },
 ]
 
 # Database file
