@@ -1,6 +1,6 @@
 from aiogram import Router, F, Bot
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 from aiogram.exceptions import TelegramBadRequest
 from config import MANDATORY_CHANNELS, ADMIN_IDS
 import database
@@ -81,6 +81,24 @@ async def handle_video_message(message: Message, bot: Bot):
             f"💡 Maslahat: Videoni bazaga avtomatik qo'shish uchun, videoni botga yuborayotganda **izoh (caption)** qismiga faqat kino kodini (masalan: `111`) yozing.",
             parse_mode="Markdown"
         )
+
+@router.message(Command("del"))
+async def cmd_delete_movie(message: Message, bot: Bot):
+    if message.from_user.id not in ADMIN_IDS:
+        return
+        
+    parts = message.text.split()
+    if len(parts) != 2:
+        await message.answer("❌ Xato format. Foydalanish: `/del kod` (masalan: `/del 123`)", parse_mode="Markdown")
+        return
+        
+    code = parts[1]
+    deleted = await database.delete_movie(code)
+    
+    if deleted:
+        await message.answer(f"✅ {code}-kodli kino bazadan o'chirildi!")
+    else:
+        await message.answer(f"❌ {code}-kodli kino bazada topilmadi.")
 
 @router.message(F.text)
 async def process_movie_code(message: Message, bot: Bot):
