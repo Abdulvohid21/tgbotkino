@@ -2,7 +2,7 @@ from aiogram import Router, F, Bot
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import CommandStart
 from aiogram.exceptions import TelegramBadRequest
-from config import MANDATORY_CHANNELS, ADMIN_ID
+from config import MANDATORY_CHANNELS, ADMIN_IDS
 import database
 
 router = Router()
@@ -60,7 +60,7 @@ async def check_sub_handler(callback: CallbackQuery, bot: Bot):
 
 @router.message(F.video)
 async def handle_video_message(message: Message, bot: Bot):
-    if message.from_user.id != ADMIN_ID:
+    if message.from_user.id not in ADMIN_IDS:
         await message.answer("❌ Sizda videolarni bazaga qo'shish huquqi yo'q!")
         return
 
