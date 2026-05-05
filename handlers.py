@@ -81,20 +81,25 @@ async def handle_video_message(message: Message, bot: Bot):
     file_id = message.video.file_id
     caption = message.caption
     
-    # Agar izohda faqat raqam (kod) yozilgan bo'lsa, bazaga saqlaymiz
-    if caption and caption.strip().isdigit():
-        code = caption.strip()
-        # videoni bazaga qo'shish
-        await database.add_movie(code=code, file_id=file_id, description=f"Kino kodi: {code}")
-        await message.answer(f"✅ Video bazaga muvaffaqiyatli qo'shildi!\n\n🎬 Kod: {code}")
-    else:
-        # Kod yozilmagan bo'lsa, shunchaki file_id ni qaytaramiz
-        await message.answer(
-            f"📹 Video qabul qilindi!\n\n"
-            f"Buning File ID raqami:\n`{file_id}`\n\n"
-            f"💡 Maslahat: Videoni bazaga avtomatik qo'shish uchun, videoni botga yuborayotganda **izoh (caption)** qismiga faqat kino kodini (masalan: `111`) yozing.",
-            parse_mode="Markdown"
-        )
+    # Agar izoh (caption) kiritilgan bo'lsa va uning birinchi so'zi raqam (kod) bo'lsa
+    if caption:
+        first_word = caption.split()[0]
+        if first_word.isdigit():
+            code = first_word
+            description = caption.strip() # butun izohni saqlaymiz
+            
+            # videoni bazaga qo'shish
+            await database.add_movie(code=code, file_id=file_id, description=description)
+            await message.answer(f"✅ Video bazaga muvaffaqiyatli qo'shildi!\n\n🎬 Kod: {code}\n📝 Ma'lumotlar saqlandi.")
+            return
+
+    # Kod topilmasa yoki noto'g'ri bo'lsa
+    await message.answer(
+        f"📹 Video qabul qilindi lekin bazaga qo'shilmadi!\n\n"
+        f"Buning File ID raqami:\n`{file_id}`\n\n"
+        f"💡 Maslahat: Videoni bazaga avtomatik qo'shish uchun, videoni botga yuborayotganda **izoh (caption)** qismining eng boshiga **kino kodini** (masalan: `111`) yozing. Undan keyin pastidan kino nomi va boshqa ma'lumotlarni yozishingiz mumkin.",
+        parse_mode="Markdown"
+    )
 
 @router.message(Command("del"))
 async def cmd_delete_movie(message: Message, bot: Bot):
