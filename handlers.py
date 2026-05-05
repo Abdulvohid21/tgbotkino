@@ -48,6 +48,20 @@ async def cmd_start(message: Message, bot: Bot):
 
     await message.answer("Assalomu alaykum! Kino kodini yuboring:")
 
+@router.message(Command("help"))
+async def cmd_help(message: Message, bot: Bot):
+    help_text = (
+        "🤖 **Botdan foydalanish:**\n\n"
+        "🎬 Kino qidirish uchun botga kino kodini yuboring (masalan: `123`).\n"
+    )
+    if message.from_user.id in ADMIN_IDS:
+        help_text += (
+            "\n👨‍💻 **Admin huquqlari:**\n"
+            "➕ Kino qo'shish: Videoni yuboring va izohiga (caption) kodini yozing.\n"
+            "🗑 Kino o'chirish: `/del kod` (masalan: `/del 123`)\n"
+        )
+    await message.answer(help_text, parse_mode="Markdown")
+
 @router.callback_query(F.data == "check_sub")
 async def check_sub_handler(callback: CallbackQuery, bot: Bot):
     is_subscribed = await check_user_subscriptions(bot, callback.from_user.id)
@@ -104,6 +118,10 @@ async def cmd_delete_movie(message: Message, bot: Bot):
 async def process_movie_code(message: Message, bot: Bot):
     code = message.text.strip()
     
+    # Agar matn "/" bilan boshlansa, uni kino kodi deb qabul qilmaymiz
+    if code.startswith('/'):
+        return
+        
     # 1. Check subscription first
     is_subscribed = await check_user_subscriptions(bot, message.from_user.id)
     if not is_subscribed:
