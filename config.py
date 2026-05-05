@@ -1,7 +1,7 @@
 import os
 
 # Your Telegram Bot Token from @BotFather
-BOT_TOKEN = "8640151765:AAE2Xg9m7Q4_RAhRrL4UgqEza2C_TM-pCzo"
+BOT_TOKEN = "8787806284:AAEI0V5XNzl0x2Y-hsjnQN9YsDd2PMMukyw"
 
 # Adminlar Telegram ID raqamlari
 ADMIN_IDS = [
