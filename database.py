@@ -32,3 +32,9 @@ async def add_movie(code: str, file_id: str, description: str = ""):
         await db.execute('INSERT OR REPLACE INTO movies (code, file_id, description) VALUES (?, ?, ?)', 
                          (code, file_id, description))
         await db.commit()
+
+async def delete_movie(code: str) -> bool:
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute('DELETE FROM movies WHERE code = ?', (code,))
+        await db.commit()
+        return cursor.rowcount > 0
