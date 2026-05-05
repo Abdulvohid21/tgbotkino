@@ -151,8 +151,8 @@ async def process_movie_code(message: Message, bot: Bot):
         try:
             # Try to send as video first
             await message.answer_video(video=file_id, caption=description)
-        except Exception:
-            # If it fails (e.g. not a file_id but a link or text)
-            await message.answer(f"{description}\n\nFayl/Havola: {file_id}")
+        except Exception as e:
+            # If it fails (e.g. wrong file_id, bot token changed)
+            await message.answer(f"⚠️ Video jo'natishda xatolik yuz berdi: {str(e)}\n\n{description}\n\nFayl/Havola: {file_id}")
     else:
         await message.answer("😔 **Kechirasiz!** Bunday kod bilan kino topilmadi.\n\n🔄 Iltimos, kodni to'g'riligini tekshirib, qaytadan yuborib ko'ring.", parse_mode="Markdown")
