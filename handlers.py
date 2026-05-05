@@ -41,12 +41,15 @@ async def cmd_start(message: Message, bot: Bot):
     is_subscribed = await check_user_subscriptions(bot, message.from_user.id)
     if not is_subscribed:
         await message.answer(
-            "Botdan foydalanish uchun quyidagi kanallarga obuna bo'lishingiz shart!\n\nSiz shartlarni bajarmadingiz:",
-            reply_markup=get_subscription_keyboard()
+            "👋 **Xush kelibsiz!**\n\n"
+            "⚠️ Botdan to'liq foydalanish va kinolarni ko'rish uchun quyidagi homiy kanallarga obuna bo'lishingiz shart!\n\n"
+            "👇 Iltimos, obuna bo'ling va tekshirish tugmasini bosing:",
+            reply_markup=get_subscription_keyboard(),
+            parse_mode="Markdown"
         )
         return
 
-    await message.answer("Assalomu alaykum! Kino kodini yuboring:")
+    await message.answer("👋 **Assalomu alaykum!**\n\n🍿 Qaysi kinoni ko'rmoqchisiz? Menga kino kodini yuboring:", parse_mode="Markdown")
 
 @router.message(Command("help"))
 async def cmd_help(message: Message, bot: Bot):
@@ -68,9 +71,9 @@ async def check_sub_handler(callback: CallbackQuery, bot: Bot):
     
     if is_subscribed:
         await callback.message.delete()
-        await callback.message.answer("Obuna tasdiqlandi! Endi kino kodini yuborishingiz mumkin.")
+        await callback.message.answer("✅ **Obuna muvaffaqiyatli tasdiqlandi!**\n\n🍿 Endi bemalol kino kodini yuborishingiz mumkin.", parse_mode="Markdown")
     else:
-        await callback.answer("Siz barcha kanallarga obuna bo'lmadingiz!", show_alert=True)
+        await callback.answer("❌ Kechirasiz, siz barcha kanallarga obuna bo'lmadingiz! Iltimos, obuna bo'ling.", show_alert=True)
 
 @router.message(F.video)
 async def handle_video_message(message: Message, bot: Bot):
@@ -131,8 +134,10 @@ async def process_movie_code(message: Message, bot: Bot):
     is_subscribed = await check_user_subscriptions(bot, message.from_user.id)
     if not is_subscribed:
         await message.answer(
-            "Siz shartlarni bajarmadingiz! Quyidagi kanallarga obuna bo'ling:",
-            reply_markup=get_subscription_keyboard()
+            "⚠️ **Diqqat!** Siz barcha kanallarga obuna bo'lmagansiz.\n\n"
+            "👇 Kino ko'rish uchun avval kanallarga obuna bo'ling:",
+            reply_markup=get_subscription_keyboard(),
+            parse_mode="Markdown"
         )
         return
 
@@ -150,4 +155,4 @@ async def process_movie_code(message: Message, bot: Bot):
             # If it fails (e.g. not a file_id but a link or text)
             await message.answer(f"{description}\n\nFayl/Havola: {file_id}")
     else:
-        await message.answer("Bunday kod bilan kino topilmadi. Boshqa kod yuborib ko'ring.")
+        await message.answer("😔 **Kechirasiz!** Bunday kod bilan kino topilmadi.\n\n🔄 Iltimos, kodni to'g'riligini tekshirib, qaytadan yuborib ko'ring.", parse_mode="Markdown")
