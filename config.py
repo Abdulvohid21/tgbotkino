@@ -4,8 +4,10 @@ import os
 BOT_TOKEN = "8640151765:AAE2Xg9m7Q4_RAhRrL4UgqEza2C_TM-pCzo"
 
 # Admin's Telegram ID
-ADMIN_ID = 0  # Shu yerga o'zingizning Telegram ID raqamingizni yozing (masalan: 123456789)
-
+ADMIN_ID = 6547348382  # Shu yerga o'zingizning Telegram ID raqamingizni yozing (masalan: 123456789)
+ADMIN_ID = 8235070957
+ADMIN_ID = 7964686556
+ADMIN_ID = 6471396425
 # List of mandatory channels
 # Format: {"id": "-100123456789", "url": "https://t.me/yourchannel", "name": "Kanal nomi"}
 MANDATORY_CHANNELS = [
