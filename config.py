@@ -16,14 +16,9 @@ ADMIN_IDS = [
 MANDATORY_CHANNELS = [
     # Replace with your actual channel IDs and URLs
      {
-         "id": "@a21dev", 
-         "url": "https://t.me/a21dev", 
-         "name": "Kanal 1"
-     },
-     {
          "id": "@kinoplay_4k", 
          "url": "https://t.me/kinoplay_4k", 
-         "name": "Kanal 2"
+         "name": "Kanal 1"
      },
 ]
 
