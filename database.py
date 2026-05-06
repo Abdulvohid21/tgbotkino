@@ -1,40 +1,68 @@
-import aiosqlite
-from config import DB_PATH
+import asyncpg
+from config import DATABASE_URL
+import logging
+
+async def connect_db():
+    try:
+        return await asyncpg.connect(DATABASE_URL)
+    except Exception as e:
+        logging.error(f"Database connection error: {e}")
+        return None
 
 async def init_db():
-    async with aiosqlite.connect(DB_PATH) as db:
-        await db.execute('''
+    conn = await connect_db()
+    if not conn:
+        return
+        
+    try:
+        await conn.execute('''
             CREATE TABLE IF NOT EXISTS movies (
                 code TEXT PRIMARY KEY,
                 file_id TEXT NOT NULL,
                 description TEXT
             )
         ''')
-        await db.commit()
         
         # Add a test movie if none exist
-        async with db.execute('SELECT COUNT(*) FROM movies') as cursor:
-            count = await cursor.fetchone()
-            if count[0] == 0:
-                # You can replace this with an actual file_id or text
-                await db.execute('INSERT INTO movies (code, file_id, description) VALUES (?, ?, ?)', 
-                                 ("100", "test_file_id_or_link_here", "Test Kino (100-kod)"))
-                await db.commit()
+        count = await conn.fetchval('SELECT COUNT(*) FROM movies')
+        if count == 0:
+            await conn.execute('''
+                INSERT INTO movies (code, file_id, description) 
+                VALUES ($1, $2, $3)
+            ''', "100", "test_file_id_or_link_here", "Test Kino (100-kod)")
+    finally:
+        await conn.close()
 
 async def get_movie(code: str):
-    async with aiosqlite.connect(DB_PATH) as db:
-        db.row_factory = aiosqlite.Row
-        async with db.execute('SELECT file_id, description FROM movies WHERE code = ?', (code,)) as cursor:
-            return await cursor.fetchone()
+    conn = await connect_db()
+    if not conn: return None
+    try:
+        row = await conn.fetchrow('SELECT file_id, description FROM movies WHERE code = $1', code)
+        if row:
+            return dict(row)
+        return None
+    finally:
+        await conn.close()
 
 async def add_movie(code: str, file_id: str, description: str = ""):
-    async with aiosqlite.connect(DB_PATH) as db:
-        await db.execute('INSERT OR REPLACE INTO movies (code, file_id, description) VALUES (?, ?, ?)', 
-                         (code, file_id, description))
-        await db.commit()
+    conn = await connect_db()
+    if not conn: return
+    try:
+        await conn.execute('''
+            INSERT INTO movies (code, file_id, description) 
+            VALUES ($1, $2, $3)
+            ON CONFLICT (code) 
+            DO UPDATE SET file_id = EXCLUDED.file_id, description = EXCLUDED.description
+        ''', code, file_id, description)
+    finally:
+        await conn.close()
 
 async def delete_movie(code: str) -> bool:
-    async with aiosqlite.connect(DB_PATH) as db:
-        cursor = await db.execute('DELETE FROM movies WHERE code = ?', (code,))
-        await db.commit()
-        return cursor.rowcount > 0
+    conn = await connect_db()
+    if not conn: return False
+    try:
+        result = await conn.execute('DELETE FROM movies WHERE code = $1', code)
+        # result returns string like "DELETE 1" or "DELETE 0"
+        return result != "DELETE 0"
+    finally:
+        await conn.close()
