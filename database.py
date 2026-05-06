@@ -44,9 +44,9 @@ async def get_movie(code: str):
     finally:
         await conn.close()
 
-async def add_movie(code: str, file_id: str, description: str = ""):
+async def add_movie(code: str, file_id: str, description: str = "") -> bool:
     conn = await connect_db()
-    if not conn: return
+    if not conn: return False
     try:
         await conn.execute('''
             INSERT INTO movies (code, file_id, description) 
@@ -54,6 +54,10 @@ async def add_movie(code: str, file_id: str, description: str = ""):
             ON CONFLICT (code) 
             DO UPDATE SET file_id = EXCLUDED.file_id, description = EXCLUDED.description
         ''', code, file_id, description)
+        return True
+    except Exception as e:
+        logging.error(f"Error adding movie: {e}")
+        return False
     finally:
         await conn.close()
 
