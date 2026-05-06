@@ -22,5 +22,5 @@ MANDATORY_CHANNELS = [
      },
 ]
 
-# Database file
-DB_PATH = "movies.db"
+# Database URL (Railway'dan olinadi yoki local testing uchun)
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/movies")
