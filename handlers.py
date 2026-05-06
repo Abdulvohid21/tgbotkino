@@ -92,8 +92,11 @@ async def handle_video_message(message: Message, bot: Bot):
             description = caption.strip() # butun izohni saqlaymiz
             
             # videoni bazaga qo'shish
-            await database.add_movie(code=code, file_id=file_id, description=description)
-            await message.answer(f"✅ Video bazaga muvaffaqiyatli qo'shildi!\n\n🎬 Kod: {code}\n📝 Ma'lumotlar saqlandi.")
+            success = await database.add_movie(code=code, file_id=file_id, description=description)
+            if success:
+                await message.answer(f"✅ Video bazaga muvaffaqiyatli qo'shildi!\n\n🎬 Kod: {code}\n📝 Ma'lumotlar saqlandi.")
+            else:
+                await message.answer("❌ Bazaga qo'shishda xatolik yuz berdi! (Baza ulanmagan bo'lishi mumkin)")
             return
 
     # Kod topilmasa yoki noto'g'ri bo'lsa
